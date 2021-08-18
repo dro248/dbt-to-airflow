@@ -1,27 +1,50 @@
 # IMPORT SHIM: added to make pytest understand path structure
 import sys, os
+
 myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + "/../")
 
 # Imports
 from dbt_dag_parser import DbtDagParser
 import networkx as nx
+import json
 
 MANIFEST_PATH = "manifest.json"
+
+
+#####################
+#   PARSER tests    #
+#####################
+
+
+def test_parser__load_manifest_is_dict():
+    manifest_obj = DbtDagParser.load_dbt_manifest(manifest_path=MANIFEST_PATH)
+
+    assert isinstance(
+        manifest_obj, dict
+    ), f"""
+        Expected: type(manifest_obj) -> dict
+        Received: type(manifest_obj) -> {type(manifest_obj)}
+        """
+
+
+#####################
+#   GRAPH tests     #
+#####################
 
 
 def test_graph__not_empty():
     """Validates that a graph is created and is not empty."""
     dag_parser = DbtDagParser(manifest_path=MANIFEST_PATH)
 
-    assert(dag_parser.graph.number_of_nodes() > 0)
+    assert dag_parser.graph.number_of_nodes() > 0
 
 
 def test_graph__is_dag():
     """Validates that a graph is directed and acyclic (i.e. a DAG)."""
     dag_parser = DbtDagParser(manifest_path=MANIFEST_PATH)
 
-    assert(nx.is_directed_acyclic_graph(dag_parser.graph) is True)
+    assert nx.is_directed_acyclic_graph(dag_parser.graph) is True
 
 
 def test_graph__correct_structure():
@@ -42,266 +65,129 @@ def test_graph__all_nodes_exist():
     """
     Validates that our graph contains all of the nodes in the manifest.json file.
     """
-    dag_parser = DbtDagParser(manifest_path=MANIFEST_PATH)
-    all_nodes = {
-        "inegi_2pbi_stg",
-        "mx_stores_stg",
-        "stg_dataplor_coordinates",
-        "stg_mx_store_coordinates",
-        "inegi2_step1",
-        "inegi2_step2",
-        "inegi2_step3",
-        "inegi2_step4",
-        "inegi2_step5",
-        "stg_lookup",
-        "stg_mobility_data",
-        "tradearea_df_lf",
-        "tradearea_df_sf",
-        "tradearea_r_lf",
-        "tradearea_r_sf",
-        "tradearea_u_lf",
-        "tradearea_u_sf",
-        "dataplor",
-        "dls_latam_ins_categoria",
-        "dls_latam_ins_cia_ruta",
-        "dls_latam_ins_maestrocliente",
-        "dls_latam_ins_nivelcliente",
-        "dls_latam_ins_producto",
-        "dls_latam_ins_ruta",
-        "dls_latam_ins_semana",
-        "dls_latam_ins_sucursal",
-        "dls_latam_ins_tipocliente",
-        "dls_latam_ins_tiporuta",
-        "dls_latam_ins_vtaclipro_sem_v",
-        "inegi_2_stg",
-        "inegi_stg",
-        "nse_stg",
-        "urbanicity_stg",
-        "inegi",
-        "inegi_2",
-        "inegi_2pbi",
-        "mapping_id_cliente_dataplor_all",
-        "mapping_id_cliente_quadkey_all",
-        "mx_products",
-        "mx_sales_current_and_last_year",
-        "mx_sales_des_trimestre",
-        "mx_sales_l26_wk",
-        "mx_sales_l52_wk",
-        "mx_sales_periodo",
-        "mx_sales_wk",
-        "mx_stores",
-        "nse",
-        "store_mobility",
-        "store_poi_counts",
-        "tradearea",
-        "urbanicity",
-        "mobility_adm1_mx",
-        "dx_fl_sales_cust_wk_prod",
-        "dx_msa_xref_der",
-        "dx_pbc_sales_cust_wk_prod",
-        "exp_geo_temp",
-        "geo_retailer_stg_temp",
-        "mvh_retailer_dim_temp1",
-        "mvh_retailer_dim_temp2",
-        "avbl_is_percentile_1",
-        "avbl_is_percentile_2",
-        "avbl_is_percentile_3",
-        "avbl_is_percentile_4",
-        "avbl_is_percentile_5",
-        "is_percentile_1",
-        "is_percentile_2",
-        "is_percentile_3",
-        "is_percentile_4",
-        "is_percentile_5",
-        "is_percentile_6",
-        "is_percentile_7",
-        "is_percentile_8",
-        "trifecta_is_cap_iri_adjf_avbl_tmp",
-        "dx_fl_trade_chnl_lkp",
-        "dx_msa_xref",
-        "dx_pbc_trade_chnl_lkp",
-        "fsv_gsc_z9_drivetime",
-        "fsv_is_coeff_raw",
-        "fsv_is_means_raw",
-        "fsv_stores",
-        "fvh_cs_coeff_raw",
-        "fvh_fs_coeff_raw",
-        "fvh_life_stage_raw",
-        "fvh_t_test_raw",
-        "cbsa_list",
-        "gsc_msa_z9_drivetime",
-        "mvh_retailers_aldi",
-        "mvh_retailers_tj",
-        "mvh_retailers_wf",
-        "iri_pepsi_fb_raw",
-        "is_coeff_raw_stg",
-        "is_means_raw",
-        "experian_cv_stg",
-        "exp_fvh",
-        "exp_geo_is_cg_fvh",
-        "fvh_cluster",
-        "fvh_cs_fs",
-        "fvh_currentspend",
-        "fvh_life_stage_stg",
-        "fvh_probability",
-        "fvh_t_value",
-        "exp_geo_is_cg",
-        "dx_store_attr",
-        "exp_geo",
-        "exp_geo_lmtd_cv",
-        "exp_geo_null",
-        "geo_new_retailer_info",
-        "geo_retailer_stg",
-        "geo_retailer_zip9_chain_count",
-        "geo_retailer_zip9_info",
-        "geo_retailer_zip9_zip5_chain_count",
-        "exp_geo_is_cg_fvh_iri",
-        "iri_all",
-        "exp_geo_is",
-        "is_coeff_raw",
-        "is_hh_store_tc",
-        "is_hh_store_tc_transpose",
-        "is_hh_transpose",
-        "retailer_data_store_full",
-        "mvh_retailer_dim",
-        "mvh_retailer_fact",
-        "retailer_sp_hh_all_store",
-        "retailer_sp_msa_drivetime",
-        "retailer_sp_zip9_drivetime",
-        "avbl_is_percentile",
-        "fvh_percentile",
-        "is_percentile",
-        "trifecta_is_cap",
-        "trifecta_is_cap_iri_adjf_avbl",
-        "stg_fl_cust",
-        "stg_fl_prod_sales",
-        "stg_fl_sales",
-        "stg_fl_xref_unique",
-        "stg_pbc_cust",
-        "stg_pbc_sales",
-        "stg_pbc_xref_unique",
-        "cm_btg_fl_sales_tdlinx1",
-        "cm_btg_pbc_sales_tdlinx1",
-        "cm_stage_btg_fl_sales_cust_prod_upc",
-        "cm_stage_btg_fl_sales_cust_wk_prod_upc",
-        "cm_stage_btg_pbc_sales_cust_prod_upc",
-        "cm_stage_btg_pbc_sales_cust_wk_prod_upc",
-        "btg_fl_retailer_assgnt",
-        "btg_pbc_new_mkt_loc",
-        "btg_pbc_retailer_assgnt",
-        "btg_pbc_route_data",
-        "btg_pep_calendar",
-        "btg_ref_calendar",
-        "fl_cust",
-        "fl_prod",
-        "fl_sales_2018",
-        "fl_sales_2019",
-        "fl_sales_2020",
-        "fl_sales_2021",
-        "mdm_msa_fl_xref",
-        "mdm_msa_pbc_xref",
-        "pbc_cust",
-        "pbc_prod",
-        "pbc_sales_2018",
-        "pbc_sales_2019",
-        "pbc_sales_2020",
-        "pbc_sales_2021",
-        "iri_pbc_markets_divs_by_fips",
-        "iri_rma_store_list",
-        "iri_srma_sample_stores",
-        "msa_tdlinx_xref_final",
-        "p_msa_cust_xref_tdlinx",
-        "zip_code_priority_report",
-        "btg_fl_cust_v",
-        "btg_fl_prod_v",
-        "btg_fl_retailer_assgnt_excptn_v",
-        "btg_fl_retailer_xref_v",
-        "btg_fl_sales_cust_prod_v",
-        "btg_fl_sales_cust_v",
-        "btg_fl_sales_cust_wk_prod_v",
-        "btg_fl_sales_cust_wk_v",
-        "btg_fl_sales_v",
-        "btg_load_stat",
-        "btg_msa_fl_xref",
-        "btg_msa_fl_xref_v",
-        "btg_msa_lat_lon_v",
-        "btg_msa_pbc_xref",
-        "btg_msa_pbc_xref_v",
-        "btg_pbc_cust_v",
-        "btg_pbc_prod_v",
-        "btg_pbc_retailer_assgnt_excptn_v",
-        "btg_pbc_retailer_xref_v",
-        "btg_pbc_sales_cust_prod_v",
-        "btg_pbc_sales_cust_v",
-        "btg_pbc_sales_cust_wk_prod_v",
-        "btg_pbc_sales_cust_wk_v",
-        "btg_pbc_sales_v",
-        "btg_pep_calendar_v",
-        "fl_sales",
-        "fl_sales_cust_agg",
-        "fl_sales_cust_prod_agg",
-        "fl_sales_cust_wk_agg",
-        "pbc_sales",
-        "pbc_sales_agg_cust",
-        "pbc_sales_cust_agg_no_allied",
-        "pbc_sales_cust_prod_agg",
-        "pbc_sales_cust_wk_agg",
-        "pbc_sales_cust_wk_agg_no_allied",
-        "btg_fl_prod_upc_sale_seq",
-        "btg_fl_sales_cust_prod_v_extend",
-        "btg_fl_sales_cust_wk_prod_v_extend",
-        "btg_pbc_prod_upc_sale_seq",
-        "btg_pbc_sales_cust_prod_v_extend",
-        "btg_pbc_sales_cust_wk_prod_v_extend",
-        "cm_btg_fl_sales_cust_pd_prod_upc",
-        "cm_btg_fl_sales_cust_pd_prod_v",
-        "cm_btg_fl_sales_cust_prod_invenid",
-        "cm_btg_fl_sales_cust_prod_upc",
-        "cm_btg_fl_sales_cust_prod_v",
-        "cm_btg_fl_sales_cust_wk_prod_invenid",
-        "cm_btg_fl_sales_cust_wk_prod_upc",
-        "cm_btg_fl_sales_cust_wk_prod_v",
-        "cm_btg_pbc_sales_cust_pd_prod_upc",
-        "cm_btg_pbc_sales_cust_pd_prod_v",
-        "cm_btg_pbc_sales_cust_prod_invenid",
-        "cm_btg_pbc_sales_cust_prod_upc",
-        "cm_btg_pbc_sales_cust_prod_v",
-        "cm_btg_pbc_sales_cust_wk_prod_invenid",
-        "cm_btg_pbc_sales_cust_wk_prod_upc",
-        "cm_btg_pbc_sales_cust_wk_prod_v",
-        "dx_fl_prod",
-        "dx_fl_sales_cust_wk_prod_extend",
-        "dx_pbc_prod",
-        "dx_pbc_sales_cust_wk_prod_extend",
-        "btg_fl_sales_cust_prod_v_extend_WM",
-        "btg_fl_sales_cust_wk_prod_v_extend_WM",
-        "btg_pbc_sales_cust_prod_v_extend_WM",
-        "btg_pbc_sales_cust_wk_prod_v_extend_WM",
-        "dx_fl_sales_cust_wk_prod_extend_WM",
-        "dx_pbc_sales_cust_wk_prod_extend_WM",
-        "dx_retailer_trade_area",
-        "mvh_demog_data",
-        "mvh_retailer_prod_attr_data",
-        "btg_fl_sales_cust_prod_v_extend_sc",
-        "btg_fl_sales_cust_prod_v_extend_wm",
-        "btg_fl_sales_cust_wk_prod_v_extend_sc",
-        "btg_fl_sales_cust_wk_prod_v_extend_wm",
-        "btg_pbc_sales_cust_prod_v_extend_sc",
-        "btg_pbc_sales_cust_prod_v_extend_wm",
-        "btg_pbc_sales_cust_wk_prod_v_extend_sc",
-        "btg_pbc_sales_cust_wk_prod_v_extend_wm",
-        "dx_fl_sales_cust_wk_prod_extend_sc",
-        "dx_fl_sales_cust_wk_prod_extend_wm",
-        "dx_id_sc",
-        "dx_id_wm",
-        "dx_pbc_sales_cust_wk_prod_extend_sc",
-        "dx_pbc_sales_cust_wk_prod_extend_wm",
-        "dx_retailer_trade_area_sc",
-        "dx_retailer_trade_area_wm",
-        "mvh_demog_data_sc",
-        "mvh_demog_data_wm",
-        "mvh_retailer_prod_attr_data_sc",
-        "mvh_retailer_prod_attr_data_wm",
-    }
+    # Parse all node directly from the manifest
+    with open(MANIFEST_PATH, "r") as jf:
+        manifest_dict = json.load(jf)
 
-    assert(set(dag_parser.graph.nodes()) == all_nodes)    
+    # this is ground truth
+    all_nodes = set(
+        [
+            model.split(".")[-1]
+            for model in manifest_dict["nodes"].keys()
+            if model.startswith("model")
+        ]
+    )
+
+    # generate the graph
+    dag_parser = DbtDagParser(manifest_path=MANIFEST_PATH)
+
+    all_nodes_in_graph = set(dag_parser.graph.nodes())
+
+    assert (
+        all_nodes_in_graph == all_nodes
+    ), f"""
+    Expected: all_nodes_in_graph == all_nodes
+    Received:
+        * len(all_nodes):                 {len(all_nodes)}
+        * len(all_nodes_in_graph):        {len(all_nodes_in_graph)}
+        * all_nodes - all_nodes_in_graph: {len(all_nodes - all_nodes_in_graph)}
+    """
+
+
+#####################
+#   FILTER tests    #
+#####################
+
+
+def test_graph__filtered_nodes_one_filter():
+    """
+    Validate that the filter works.
+    We need to be sure that:
+    - that the correct nodes are in the graph
+    - the hierarchy of nodes is correct
+    """
+    manifest_dict = DbtDagParser.load_dbt_manifest(manifest_path=MANIFEST_PATH)
+    filter_tags = {"refresh_weekly"}
+
+    dag_parser = DbtDagParser(manifest_path=MANIFEST_PATH, dbt_tags=filter_tags)
+    graph = dag_parser.graph
+
+    # ground truth for refresh_weekly tags
+    all_refresh_weekly_nodes = set(
+        [
+            model.split(".")[-1]
+            for model in manifest_dict["nodes"].keys()
+            if filter_tags.issubset(set(manifest_dict["nodes"][model]["tags"]))
+        ]
+    )
+
+    all_nodes_in_graph = set(graph.nodes())
+
+    # Check: Validate that the graph is NOT empty
+    assert len(all_nodes_in_graph) > 0, "Graph is empty!"
+
+    assert (
+        "mx_stores_stg" not in all_nodes_in_graph
+    ), f"`mx_stores_stg` should not be in graph"
+
+    assert "dataplor" in all_nodes_in_graph, f"`dataplor` should be in graph"
+
+    # Check: Validate that the graph has EXACTLY the nodes we're expecting
+    assert (
+        all_refresh_weekly_nodes == all_nodes_in_graph
+    ), "Graph didn't match what we expected."
+
+    # check: dls_latam_ins_producto -> mx_sales_wk
+    assert "dls_latam_ins_producto" in list(
+        graph.predecessors("mx_sales_wk")
+    ), f"""
+    Incorrect structure.
+    Expected: `dls_latam_ins_producto` to be upstream to `mx_sales_wk`
+    """
+
+
+def test_graph__filtered_nodes_multi_filter():
+    """
+    Validate that multiple filters work.
+    We need to be sure that:
+    - that the correct nodes are in the graph
+    - the hierarchy of nodes is correct
+    """
+    manifest_dict = DbtDagParser.load_dbt_manifest(manifest_path=MANIFEST_PATH)
+    filter_tags = {"mx", "refresh_weekly"}
+
+    dag_parser = DbtDagParser(manifest_path=MANIFEST_PATH, dbt_tags=filter_tags)
+    graph = dag_parser.graph
+
+    # ground truth for refresh_weekly tags
+    all_refresh_weekly_nodes = set(
+        [
+            model.split(".")[-1]
+            for model in manifest_dict["nodes"].keys()
+            if filter_tags.issubset(set(manifest_dict["nodes"][model]["tags"]))
+        ]
+    )
+
+    all_nodes_in_graph = set(graph.nodes())
+
+    # Check: Validate that the graph is NOT empty
+    assert len(all_nodes_in_graph) > 0, "Graph is empty!"
+
+    assert (
+        "mx_stores_stg" not in all_nodes_in_graph
+    ), f"`mx_stores_stg` should not be in graph"
+
+    assert "dataplor" in all_nodes_in_graph, f"`dataplor` should be in graph"
+
+    # Check: Validate that the graph has EXACTLY the nodes we're expecting
+    assert (
+        all_refresh_weekly_nodes == all_nodes_in_graph
+    ), "Graph didn't match what we expected."
+
+    # check: dls_latam_ins_producto -> mx_sales_wk
+    assert "dls_latam_ins_producto" in list(
+        graph.predecessors("mx_sales_wk")
+    ), f"""
+    Incorrect structure.
+    Expected: `dls_latam_ins_producto` to be upstream to `mx_sales_wk`
+    """
