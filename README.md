@@ -1,17 +1,20 @@
 # Dbt DAG Parser
-The Dbt DAG Parser is a Python library which converts Dbt DAGs to a NetworkX graph (specifically a directed graph or "DiGraph"). From here, it is pretty straightforward to convert a NetworkX graph to an Airflow DAG. Of course, you can use any type of Workflow Management System (WMS) you'd like.
+The Dbt DAG Parser is a Python library which converts Dbt DAGs to a NetworkX graph (specifically a directed graph or "DiGraph"). From here, it is pretty straightforward to convert a NetworkX graph to an Airflow DAG.  
+  
+For your convenience, there is a `convert_to_airflow_taskgroup()` method which can do this for you. 
 
-For your convenience, there is a `convert_to_airflow_taskgroup()` method which can do this for you. Happy coding!
+>You can easily use whichever Workflow Management System (WMS) you choose. Checkout how in the **Usage** section below.
 
 
 ## Problem 
-We would like to leverage Dbt in production. There is a lot that Dbt does well (like DAG generation). However, once Dbt generates a DAG, we want Airflow to handle the running of the DAG, not Dbt.
+We want to leverage Dbt in production. There is a lot that Dbt does well (like DAG generation). However, once Dbt generates a DAG, we want Airflow to handle the running of the DAG, not Dbt.
 
-#### The Good – Dbt dag building
-Dbt has a bunch of awesome utilities such as built-in *DAG builder*. This allows it to build the dependency graph via the `ref` function used in the models.
+#### The Good – Dbt's DAG Builder
+Dbt has an awesome, built-in *DAG builder*. This allows it to automatically generate the dependency graph via the `ref` function used in the models.
 
-#### The Bad – Dbt dag running
-Dbt also has a built-in *DAG runner*. However, Dbt’s DAG runner is missing some important features that come out-of-the-box with other WMSs (like Airflow). Further, by using Dbt's builtin DAG runner, we only have access to Dbt-specific tooling and miss out on things like:
+#### The Bad – Dbt's DAG Runner
+Dbt also has a built-in *DAG runner*. However, Dbt’s DAG runner is missing some important features that come out-of-the-box with other WMSs (like Airflow). 
+Further, by using Dbt's builtin DAG runner, we only have access to Dbt-specific tooling and miss out on things like:
 - creating custom DAG structures
 - perform inline testing
 - using itermediate tooling like [Great Expectations](https://greatexpectations.io/)
@@ -59,6 +62,6 @@ dag_parser = DbtDagParser(
 The above example will find all nodes containing ALL of tags in the tuple ('mexico_project', 'refresh:weekly')
 
 #### Final Thoughts:
-The Dbt DAG parser depends on the `manifest.json` file that is created by running `dbt compile`.
+The Dbt DAG parser depends on the **manifest.json** file that is created by running `dbt compile`.
 
-If you have make changes to your Dbt models, you must rerun the `dbt compile` command for those changes to be reflected in the `manifest.json` file.
+If you have make changes to your Dbt models, you must rerun the `dbt compile` command for those changes to be reflected in the **manifest.json** file.
