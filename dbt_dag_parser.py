@@ -7,7 +7,7 @@ By parsing the Dbt manifest.json file, we are able to build a graph using Python
 We can then easily create it in Airflow.
 """
 import json
-import networkx as nx
+import networkx as nx 
 
 
 class DbtDagParser:
