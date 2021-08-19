@@ -1,4 +1,5 @@
-# Dbt DAG Parser
+# Dbt DAG Parser ![example workflow](https://github.com/dro248/DbtDagParser/actions/workflows/python-app.yml/badge.svg)
+
 The Dbt DAG Parser is a Python library which converts Dbt DAGs to a NetworkX graph (specifically a directed graph or "DiGraph"). From here, it is pretty straightforward to convert a NetworkX graph to an Airflow DAG.  
   
 For your convenience, there is a `convert_to_airflow_taskgroup()` method which can do this for you. 
