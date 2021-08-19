@@ -141,5 +141,5 @@ class DbtDagParser:
 if __name__ == "__main__":
 
     MANIFEST_PATH = "manifest.json"
-    dag_parser = DbtDagParser(manifest_path=MANIFEST_PATH, dbt_tags={"mx", "refresh_weekly"})
+    dag_parser = DbtDagParser(manifest_path=MANIFEST_PATH, dbt_tags=("mx", "refresh_weekly"))
     dag_parser.draw_graph()
