@@ -1,10 +1,11 @@
 """
 Dbt Dag Parser:
+The purpose of this parser is to facilitate converting Dbt DAGs to filtered Airflow DAGs.
 
-The purpose of this parser is to leverage Dbt's automatic DAG generator to build Airflow DAGs.
+By parsing the Dbt manifest.json file, the DbtDagParser builds a DAG using Python's NetworkX library.
+From this format, we can easily be generate a Airflow DAG.
 
-By parsing the Dbt manifest.json file, we are able to build a graph using Python's NetworkX library.
-We can then easily create it in Airflow.
+> Reference: https://github.com/dro248/DbtDagParser
 """
 import json
 import networkx as nx 
