@@ -46,7 +46,7 @@ dag_parser = DbtDagParser(manifest_path="manifest.json")
 with DAG(...) as dag:
     dbt_task_group = dag_parser.convert_to_airflow_dag(dag=dag)
 
-    # You can treat an Airflow task as you would a list of operators
+    # You can treat an Airflow TaskGroup as you would a list of operators
     dbt_task_group >> some_other_task
 ```
 
