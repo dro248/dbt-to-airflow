@@ -74,6 +74,9 @@ class DbtDagParser:
             if node_name.split(".")[0] == "model" and self.dbt_tags.issubset(tags):
 
                 for upstream_node in manifest_json["nodes"][node_name]["depends_on"]["nodes"]:
+                    if upstream_node.split(".")[0] != "model":
+                        continue
+
                     upstream_node_tags = set(manifest_json["nodes"][upstream_node]["tags"])
 
                     # add node hierarchy if both current-node and upstream-node have our filters

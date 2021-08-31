@@ -8,8 +8,9 @@ sys.path.insert(0, myPath + "/../")
 from dbt_dag_parser import DbtDagParser
 import networkx as nx
 import json
+from baseconfig import BASE_DIR
 
-MANIFEST_PATH = "manifest.json"
+MANIFEST_PATH = os.path.join(BASE_DIR, "manifest.json")
 
 
 #####################
