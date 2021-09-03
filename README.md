@@ -18,7 +18,7 @@ Dbt also has a built-in *DAG runner*. However, Dbt’s DAG runner is missing som
 Further, by using Dbt's builtin DAG runner, we only have access to Dbt-specific tooling and miss out on things like:
 - creating custom DAG structures
 - perform inline testing
-- using itermediate tooling like [Great Expectations](https://greatexpectations.io/)
+- using intermediate tooling like [Great Expectations](https://greatexpectations.io/)
 - etc.
 
 
@@ -63,6 +63,6 @@ dag_parser = DbtDagParser(
 The above example will find all nodes containing ALL of tags in the tuple ('mexico_project', 'refresh:weekly')
 
 #### Final Thoughts:
-The Dbt DAG parser depends on the **manifest.json** file that is created by running `dbt compile`.
+The Dbt DAG parser depends on the **manifest.json** file which can updated by running `dbt ls`.
 
-If you have make changes to your Dbt models, you must rerun the `dbt compile` command for those changes to be reflected in the **manifest.json** file.
+If you have make changes to your Dbt models, you must rerun the `dbt ls` command for those changes to be reflected in the **manifest.json** file.
